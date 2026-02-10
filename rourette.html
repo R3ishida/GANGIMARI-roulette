@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ガンギマリbros 卒業旅行</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bakbak+One&display=swap');
+
+        body {
+            background: #000;
+            color: #0f0;
+            font-family: 'Bakbak One', 'Arial Black', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-shadow: 0 0 10px #0f0;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            letter-spacing: 5px;
+            animation: glitch 0.2s infinite;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(2px, 2px); color: #0f0; }
+            50% { transform: translate(-2px, -2px); color: #f0f; }
+            100% { transform: translate(2px, -2px); color: #0ff; }
+        }
+
+        #wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            border: 10px double #0f0;
+            border-radius: 50%;
+            box-shadow: 0 0 50px #0f0;
+        }
+
+        /* 矢印を「🖕」に変更し、下部に配置 */
+        #arrow {
+            position: absolute;
+            bottom: -60px; /* 下側に配置 */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 80px;
+            z-index: 100;
+            /* 絵文字を赤く光らせる演出 */
+            filter: drop-shadow(0 0 15px #f00);
+            cursor: default;
+            user-select: none;
+        }
+
+        canvas {
+            border-radius: 50%;
+            transition: transform 5s cubic-bezier(0.1, 0, 0.1, 1);
+        }
+
+        .controls {
+            margin-top: 40px;
+        }
+
+        button {
+            background: #000;
+            color: #0f0;
+            border: 3px solid #0f0;
+            padding: 15px 50px;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px #0f0;
+            transition: 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.9);
+            background: #0f0;
+            color: #000;
+        }
+
+        #result-display {
+            margin-top: 20px;
+            height: 60px;
+            font-size: 2.5rem;
+            text-align: center;
+            color: #fff;
+            text-shadow: 0 0 20px #0f0;
+        }
+
+        .shaking {
+            animation: shake 0.1s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(2px, 2px); }
+            25% { transform: translate(-2px, -2px); }
+            50% { transform: translate(-2px, 2px); }
+            75% { transform: translate(2px, -2px); }
+            100% { transform: translate(0, 0); }
+        }
+    </style>
+</head>
+<body id="body">
+
+    <h1>ガンギマリbros 卒業旅行</h1>
+
+    <div id="wheel-container">
+        <div id="arrow">🖕</div>
+        <canvas id="canvas" width="400" height="400"></canvas>
+    </div>
+
+    <div class="controls">
+        <button onclick="spin()">GO TO HELL</button>
+    </div>
+
+    <div id="result-display">地獄の沙汰も運次第</div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const resultDisplay = document.getElementById('result-display');
+        const body = document.getElementById('body');
+
+        const destinations = [
+            "大阪", "京都", "岐阜", "滋賀", "名古屋", 
+            "東京", "富山", "兵庫", "HELL", "福井", "HELL"
+        ];
+
+        let currentRotation = 0;
+
+        function drawWheel() {
+            const slice = (2 * Math.PI) / destinations.length;
+            destinations.forEach((text, i) => {
+                const angle = i * slice;
+                ctx.beginPath();
+                ctx.fillStyle = (i % 2 === 0) ? "#0a0a0a" : "#1a1a1a";
+                ctx.strokeStyle = "#0f0";
+                ctx.lineWidth = 2;
+                ctx.moveTo(200, 200);
+                ctx.arc(200, 200, 200, angle, angle + slice);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.save();
+                ctx.translate(200, 200);
+                ctx.rotate(angle + slice / 2);
+                ctx.fillStyle = "#0f0";
+                ctx.font = "bold 24px sans-serif";
+                ctx.textAlign = "right";
+                ctx.fillText(text, 180, 5);
+                ctx.restore();
+            });
+        }
+
+        function spin() {
+            body.classList.add('shaking');
+            resultDisplay.innerText = "🌀 脳 汁 溢 出 中 🌀";
+            
+            const spinDegree = 2000 + Math.random() * 3000;
+            currentRotation += spinDegree;
+            
+            canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                body.classList.remove('shaking');
+                const actualDegree = currentRotation % 360;
+                const sliceAngle = 360 / destinations.length;
+                
+                // 判定位置を「下（90度）」に変更した計算式
+                // 0度は右。90度は下。
+                const index = Math.floor(((90 - (actualDegree % 360) + 360) % 360) / sliceAngle);
+                const winner = destinations[index];
+                
+                resultDisplay.innerText = `>> ${winner} に決定！！ <<`;
+                
+                body.style.background = "#f00";
+                setTimeout(() => body.style.background = "#000", 100);
+            }, 5000);
+        }
+
+        drawWheel();
+    </script>
+</body>
+</html>
